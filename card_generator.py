@@ -1,19 +1,18 @@
+import random
 import numpy as np
 import cv2
-import random
-import json
-from PIL import Image, ImageFont, ImageDraw
+from PIL import Image
 from utils import _generate_horizontal_text, resize, load_address
 from glob import glob
 
 positions = {
-    'id': [(380, 155), (677, 187)],
-    'name': [(340, 200), (723, 228)],
-    'birth': [(377, 285), (723, 308)],
-    'address1': [(415, 330), (723, 350)],
-    'address2': [(274, 370), (723, 390)],
-    'address3': [(495, 410), (723, 430)],
-    'address4': [(274, 450), (723, 470)],
+    'id': [(380-35, 155-38), (677-35, 187-38)],
+    'name': [(340-35, 200-38), (723-35, 228-38)],
+    'birth': [(377-35, 285-38), (723-35, 308-38)],
+    'address1': [(415-35, 330-38), (723-35, 350-38)],
+    'address2': [(274-35, 370-38), (723-35, 390-38)],
+    'address3': [(495-35, 410-38), (723-35, 430-38)],
+    'address4': [(274-35, 450-38), (723-35, 470-38)],
 }
 
 address_list = load_address()
@@ -64,14 +63,50 @@ def paste_pose(background):
     image = Image.open(img_path)
 
     image = resize(image, 166, 219)
-    background.paste(image, (75, 225))
+    background.paste(image, (75-35, 225-38))
 
+
+def find_coeffs(pa, pb):
+    matrix = []
+    for p1, p2 in zip(pa, pb):
+        matrix.append([p1[0], p1[1], 1, 0, 0, 0, -p2[0]*p1[0], -p2[0]*p1[1]])
+        matrix.append([0, 0, 0, p1[0], p1[1], 1, -p2[1]*p1[0], -p2[1]*p1[1]])
+
+    A = np.matrix(matrix, dtype=np.float)
+    B = np.array(pb).reshape(8)
+
+    res = np.dot(np.linalg.inv(A.T * A) * A.T, B)
+    return np.array(res).reshape(8)
+
+
+def affine_transform(image):
+    width, height = image.size
+
+    corners = np.array([
+        [0, 0],
+        [width, 0],
+        [width, height],
+        [0, height]
+    ])
+    m = random.randint(-8, 8) * 0.1
+    xshift = abs(m) * height
+    new_width = width + int(round(xshift))
+    image = image.transform((new_width, height), Image.AFFINE, (1, m, -xshift if m > 0 else 0, 0, 1, 0))
+    cornersx = corners[:, 0] + np.round((height - corners[:, 1]) * m + (xshift if m < 0 else 0))
+    width, height = image.size
+    m = random.randint(-8, 8) * 0.1
+    yshift = abs(m) * width
+    new_height = height + int(round(yshift))
+    image = image.transform((width, new_height), Image.AFFINE, (1, 0, 0, m, 1, -yshift if m > 0 else 0), Image.BICUBIC)
+    cornersy = corners[:, 1] + np.round((width - cornersx) * m + (yshift if m < 0 else 0))
+
+    return image, np.array(list(zip(cornersx, cornersy)), dtype='int')
 
 
 def get_card():
-    path = '/home/tupm/projects/Identity_card/assets/background/cmt_bacground.png'
+    path = 'assets/background/cmt_bacground.png'
 
-    image = Image.open(path)
+    image = Image.open(path).convert('RGBA')
 
     info = get_random_info()
 
@@ -85,11 +120,12 @@ def get_card():
 
     paste_pose(image)
 
-    image.show()
+    image, coordinates = affine_transform(image)
+    return image, coordinates
 
 
 if __name__ == '__main__':
-    get_card()
-    # cv2.imshow('', cv2.imread('/home/tupm/projects/Identity_card/assets/background/cmt_bacground.png'))
+    get_card().show()
+    # cv2.imshow('', cv2.imread('assets/background/cmt_bacground.png'))
     # cv2.waitKey(0)
     # read_location()

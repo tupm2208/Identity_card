@@ -74,14 +74,14 @@ def resize(image, width=None, height=None):
 
 
 def load_address():
-    with open('/home/tupm/projects/Identity_card/assets/local.txt', encoding='utf8') as f:
+    with open('assets/local.txt', encoding='utf8') as f:
         return f.readlines()
 
 def convert_data():
-    with open('/home/tupm/projects/Identity_card/assets/local.json', encoding='utf8') as f:
+    with open('assets/local.json', encoding='utf8') as f:
         data = json.load(f)
 
-    f = open('/home/tupm/projects/Identity_card/assets/local.txt', 'w+', encoding='utf8')
+    f = open('assets/local.txt', 'w+', encoding='utf8')
 
     # print(data[0]['districts'][0]['wards'])
     for tp in data:

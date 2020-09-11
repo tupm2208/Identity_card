@@ -12,8 +12,6 @@ from tqdm import tqdm
 background_path_list = glob('assets/background2/*')
 
 
-
-
 def after_resize(bg_size, card, coordinates):
     min_size=100
     left, top, right, bottom = card.getbbox()
@@ -30,10 +28,8 @@ def after_resize(bg_size, card, coordinates):
 
     coordinates = coordinates.astype('float')
 
-
     coordinates[:, 0] *= nw/right
     coordinates[:, 1] *= nh/bottom
-
     return card, coordinates
 
 
@@ -47,9 +43,18 @@ def get_output_file(idx):
 
 
 def get_label_yolo(image_path, coordinates, img_size):
+    
+    # img = cv2.imread(image_path)
+
+    # for cx, cy in coordinates.astype(int):
+    #     cv2.circle(img, (cx, cy), 3, (255, 0, 0), 2)
+    
+    # cv2.imshow('', img)
+    # cv2.waitKey(0)
+    
     w, h = img_size
-    padding_x = w//20
-    padding_y = h//20
+    padding_x = w//30
+    padding_y = h//30
 
     coordinates[:, 0] /= w
     coordinates[:, 1] /= h
@@ -104,14 +109,13 @@ def gen_card_on_background(idx):
     py = random.randint(0, py)
     background.paste(card, (px, py), card)
     output_img_path = get_output_file(idx)
-    
+
     background = add_shadow(background)
 
     background.save(output_img_path, 'JPEG')
 
     coordinates[:, 0] += px
     coordinates[:, 1] += py
-    
 
     return output_img_path, coordinates, bg_size
 
@@ -123,7 +127,7 @@ if __name__ == '__main__':
     
     pool = Pool(4)
 
-    for output_img_path, coordinates, img_size in tqdm(pool.imap_unordered(gen_card_on_background, range(10))):
+    for output_img_path, coordinates, img_size in tqdm(pool.imap_unordered(gen_card_on_background, range(1))):
         get_label_yolo(output_img_path, coordinates, img_size)
         f.write(f'{output_img_path}\n')
 

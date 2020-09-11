@@ -122,12 +122,12 @@ def gen_card_on_background(idx):
 
 
 if __name__ == '__main__':
-    output_folder = "train"
+    output_folder = "/home/tupm/SSD/datasets/identity_card/train"
     f = open(os.path.join(output_folder, 'labels.txt'), 'w+')
     
-    pool = Pool(4)
+    pool = Pool(10)
 
-    for output_img_path, coordinates, img_size in tqdm(pool.imap_unordered(gen_card_on_background, range(1))):
+    for output_img_path, coordinates, img_size in tqdm(pool.imap_unordered(gen_card_on_background, range(10000))):
         get_label_yolo(output_img_path, coordinates, img_size)
         f.write(f'{output_img_path}\n')
 

@@ -121,6 +121,13 @@ def get_card():
     paste_pose(image)
 
     image, coordinates = affine_transform(image)
+
+    bbox = image.getbbox()
+
+    coordinates[:, 1] -= bbox[1]
+
+    image = image.crop(bbox)
+
     return image, coordinates
 
 

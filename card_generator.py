@@ -132,7 +132,8 @@ def get_card():
 
 
 if __name__ == '__main__':
-    get_card().show()
+    image, coordinates = get_card()
+    image.save('/home/tupm/HDD/projects/Identity_card/demo/main_part.png', 'PNG')
     # cv2.imshow('', cv2.imread('assets/background/cmt_bacground.png'))
     # cv2.waitKey(0)
     # read_location()

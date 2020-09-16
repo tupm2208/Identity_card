@@ -111,7 +111,6 @@ def gen_card_on_background(idx):
     output_img_path = get_output_file(idx)
 
     background = add_shadow(background)
-    output_img_path = "/home/tupm/HDD/projects/Identity_card/demo/final.jpg"
 
     background.save(output_img_path, 'JPEG')
 
@@ -127,10 +126,9 @@ if __name__ == '__main__':
     f = open(os.path.join(output_folder, 'labels.txt'), 'w+')
     
     pool = Pool(10)
-    gen_card_on_background(0)
 
-    # for output_img_path, coordinates, img_size in tqdm(pool.imap_unordered(gen_card_on_background, range(10000))):
-    #     get_label_yolo(output_img_path, coordinates, img_size)
-    #     f.write(f'{output_img_path}\n')
+    for output_img_path, coordinates, img_size in tqdm(pool.imap_unordered(gen_card_on_background, range(10000))):
+        get_label_yolo(output_img_path, coordinates, img_size)
+        f.write(f'{output_img_path}\n')
 
     f.close()

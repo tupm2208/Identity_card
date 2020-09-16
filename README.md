@@ -15,9 +15,3 @@ Fake old version of Vietnamese ID
 ### Final Image
 ![Final Image](demo/final.jpg)
 
-#### Tech stack
-
-- FaceBoxes
-- ArcFace
-- Correlative Tracking
-- PyQt5 GUI
